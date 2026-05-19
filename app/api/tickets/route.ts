@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,7 @@ export async function POST(req: NextRequest) {
     const severity = String(fd.get("severity") ?? "medium");
     const reporter_name = (fd.get("reporter_name") as string) || null;
     const reporter_contact = (fd.get("reporter_contact") as string) || null;
+    const user = await getCurrentUser();
 
     if (!project_id || !title || !description) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -28,8 +30,9 @@ export async function POST(req: NextRequest) {
         title,
         description,
         severity,
-        reporter_name,
-        reporter_contact,
+        reporter_name: reporter_name ?? user?.display_name ?? null,
+        reporter_contact: reporter_contact ?? user?.email ?? null,
+        user_id: user?.id ?? null,
       })
       .select("*")
       .single();

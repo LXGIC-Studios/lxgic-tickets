@@ -42,3 +42,16 @@ insert into projects (slug, name, description) values
   ('lxgic-mm-solana', 'Lxgic-MM Solana', 'Market making bot on Solana.'),
   ('lxgic-mm-base', 'Lxgic-MM Base', 'Market making bot on Base.')
 on conflict (slug) do nothing;
+
+-- v0.2.0: portal users + ticket->user link
+create table if not exists portal_users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  password_hash text not null,
+  display_name text,
+  created_at timestamptz default now(),
+  last_login timestamptz
+);
+
+alter table tickets add column if not exists user_id uuid references portal_users(id);
+create index if not exists tickets_user_id_idx on tickets(user_id);
