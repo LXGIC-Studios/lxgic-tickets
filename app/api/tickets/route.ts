@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     const severity = String(fd.get("severity") ?? "medium");
     const reporter_name = (fd.get("reporter_name") as string) || null;
     const reporter_contact = (fd.get("reporter_contact") as string) || null;
+    const clientTicketVersion = ((fd.get("ticket_version") as string) || "").trim() || null;
     const user = await getCurrentUser();
 
     if (!project_id || !title || !description) {
@@ -23,6 +24,18 @@ export async function POST(req: NextRequest) {
     }
 
     const sb = supabaseAdmin();
+
+    let ticket_version: string | null = clientTicketVersion;
+    if (!ticket_version) {
+      const { data: pj } = await sb
+        .from("projects")
+        .select("current_version")
+        .eq("id", project_id)
+        .maybeSingle();
+      const pjt = pj as { current_version: string | null } | null;
+      ticket_version = pjt?.current_version ?? null;
+    }
+
     const { data: ticket, error } = await sb
       .from("tickets")
       .insert({
@@ -33,6 +46,7 @@ export async function POST(req: NextRequest) {
         reporter_name: reporter_name ?? user?.display_name ?? null,
         reporter_contact: reporter_contact ?? user?.email ?? null,
         user_id: user?.id ?? null,
+        ticket_version,
       })
       .select("*")
       .single();

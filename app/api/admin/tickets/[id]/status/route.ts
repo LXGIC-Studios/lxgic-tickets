@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
-const STATUSES = ["open", "in_progress", "resolved", "wontfix", "duplicate"];
+const STATUSES = ["open", "in_progress", "fix_deployed", "resolved", "wontfix", "duplicate"];
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  if (!(await isAdminAuthorized(req))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const { id } = await ctx.params;
   const { status } = (await req.json()) as { status?: string };
   if (!status || !STATUSES.includes(status)) {

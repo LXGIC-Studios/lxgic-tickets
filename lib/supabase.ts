@@ -9,7 +9,13 @@ export const supabaseAdmin = () =>
   createClient(url, service, { auth: { persistSession: false } });
 
 export type Severity = "low" | "medium" | "high" | "critical";
-export type Status = "open" | "in_progress" | "resolved" | "wontfix" | "duplicate";
+export type Status =
+  | "open"
+  | "in_progress"
+  | "fix_deployed"
+  | "resolved"
+  | "wontfix"
+  | "duplicate";
 
 export interface Project {
   id: string;
@@ -18,12 +24,17 @@ export interface Project {
   description: string | null;
   is_active: boolean;
   created_at: string;
+  current_version?: string | null;
+  health_url?: string | null;
+  repo_url?: string | null;
+  version_checked_at?: string | null;
 }
 
 export interface Ticket {
   id: string;
   ticket_number: number;
   project_id: string;
+  user_id: string | null;
   title: string;
   description: string;
   severity: Severity;
@@ -32,6 +43,13 @@ export interface Ticket {
   reporter_contact: string | null;
   created_at: string;
   updated_at: string;
+  fix_version?: string | null;
+  fix_commit?: string | null;
+  fix_notes?: string | null;
+  fix_deployed_at?: string | null;
+  denial_count?: number | null;
+  last_denial_reason?: string | null;
+  ticket_version?: string | null;
 }
 
 export interface TicketAttachment {

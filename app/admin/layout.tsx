@@ -14,9 +14,9 @@ export default async function AdminLayout({
       {isAuth && (
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-900">
           <nav className="flex gap-5 text-sm">
-            <Link href="/admin" className="text-zinc-300 hover:text-green-500">Overview</Link>
-            <Link href="/admin/tickets" className="text-zinc-300 hover:text-green-500">Tickets</Link>
-            <Link href="/admin/projects" className="text-zinc-300 hover:text-green-500">Projects</Link>
+            <Link href="/admin" className="text-zinc-300 hover:text-green-500 transition-colors">Overview</Link>
+            <Link href="/admin/tickets" className="text-zinc-300 hover:text-green-500 transition-colors">Tickets</Link>
+            <Link href="/admin/projects" className="text-zinc-300 hover:text-green-500 transition-colors">Projects</Link>
           </nav>
           <span className="text-[10px] text-zinc-600 font-mono">v{packageJson.version}</span>
         </div>
