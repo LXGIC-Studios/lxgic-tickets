@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
     const reporter_contact = (fd.get("reporter_contact") as string) || null;
     const clientTicketVersion = ((fd.get("ticket_version") as string) || "").trim() || null;
     const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+    }
 
     if (!project_id || !title || !description) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
