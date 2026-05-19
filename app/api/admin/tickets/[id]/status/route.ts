@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { isAdminAuthorized } from "@/lib/admin-auth";
 
-const STATUSES = ["open", "in_progress", "fix_deployed", "resolved", "wontfix", "duplicate"];
+const STATUSES = ["open", "in_progress", "fix_deployed", "wontfix", "duplicate"];
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdminAuthorized(req))) {
@@ -10,6 +10,12 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   }
   const { id } = await ctx.params;
   const { status } = (await req.json()) as { status?: string };
+  if (status === "resolved") {
+    return NextResponse.json(
+      { error: "Admins cannot mark resolved. Use /mark-fixed; client must confirm." },
+      { status: 403 }
+    );
+  }
   if (!status || !STATUSES.includes(status)) {
     return NextResponse.json({ error: "Bad status" }, { status: 400 });
   }
