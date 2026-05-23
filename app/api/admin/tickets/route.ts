@@ -19,6 +19,7 @@ interface JoinedTicket {
   created_at: string;
   updated_at: string;
   projects: { name: string; slug: string } | null;
+  portal_users: { id: string; email: string; display_name: string | null } | null;
   ticket_attachments: { url: string; filename: string | null }[];
   ticket_replies: { author: string; body: string; is_admin: boolean; created_at: string }[];
 }
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest) {
   let q = supabaseAdmin()
     .from("tickets")
     .select(
-      "id,ticket_number,project_id,user_id,title,description,severity,status,reporter_name,reporter_contact,created_at,updated_at,projects(name,slug),ticket_attachments(url,filename),ticket_replies(author,body,is_admin,created_at)"
+      "id,ticket_number,project_id,user_id,title,description,severity,status,reporter_name,reporter_contact,created_at,updated_at,projects(name,slug),portal_users(id,email,display_name),ticket_attachments(url,filename),ticket_replies(author,body,is_admin,created_at)"
     )
     .order("updated_at", { ascending: false });
 
