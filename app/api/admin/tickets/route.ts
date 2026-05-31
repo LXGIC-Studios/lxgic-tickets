@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase";
 import { maybeRefreshAllVersions } from "@/lib/version";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 
@@ -24,17 +24,8 @@ interface JoinedTicket {
   ticket_replies: { author: string; body: string; is_admin: boolean; created_at: string }[];
 }
 
-async function isAuthorized(req: NextRequest): Promise<boolean> {
-  const jar = await cookies();
-  if (jar.get("admin_session")?.value === "ok") return true;
-  const auth = req.headers.get("authorization");
-  const token = process.env.ADMIN_API_TOKEN;
-  if (auth && token && auth === `Bearer ${token}`) return true;
-  return false;
-}
-
 export async function GET(req: NextRequest) {
-  if (!(await isAuthorized(req))) {
+  if (!(await isAdminAuthorized(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
